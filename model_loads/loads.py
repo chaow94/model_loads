@@ -4,22 +4,32 @@ from collections import OrderedDict
 __all__ = ["load_models"]
 
 
+# https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-model-across-devices
+
 def load_tar_models(model_path, model):
+    # TODO : load more models info: ['iter', 'best_top1_acc', 'optimizer', 'state_dict']
+    # not necessary?
     assert model_path.endswith(".tar")
     state_dict = torch.load(model_path)
+
     # create new OrderedDict that does not contain `module.`
     new_state_dict = OrderedDict()
-    try:
-        _tmp = state_dict["state_dict"]
-    except KeyError:
-        _tmp = state_dict
 
-    for k, v in _tmp.items():
-        name = k[7:]  # remove `module.`
-        new_state_dict[name] = v
-    # load params
-    model.load_state_dict(new_state_dict)
-    # TODO
+    # multi-gpu pretrain models
+    if "module." in list(state_dict['state_dict'].keys())[0]:
+        for k, v in state_dict['state_dict'].items():
+            name = k[7:]  # remove `module.`
+            new_state_dict[name] = v
+
+    state_dict['state_dict'] = new_state_dict
+
+    if isinstance(state_dict, dict) and 'state_dict' in state_dict:
+        # load params
+        model.load_state_dict(state_dict['state_dict'])
+    else:
+        # load params
+        model.load_state_dict(state_dict)
+
     return model
 
 

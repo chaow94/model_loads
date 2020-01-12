@@ -20,7 +20,7 @@ It's annoying to load cpu model to gpu devices or load multi-gpus trained model 
 To install load_models, you can do as follow:
 
 ```
-    git clone xx
+    git clone https://github.com/cwh94/model_loads.git
     cd load_models
     python setup.py bdist_egg
     python setup.py install
