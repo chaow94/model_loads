@@ -27,5 +27,9 @@ def get_gpus_info():
         print("GPU is not available or no GPUs!")
 
 
+
+
 if __name__ == "__main__":
     get_gpus_info()
+
+    torch.load("../")

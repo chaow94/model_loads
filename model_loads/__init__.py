@@ -1,4 +1,1 @@
-
-from .loads import (
-    load_models,
-)
+from .loads import load_models

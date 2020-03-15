@@ -67,10 +67,16 @@ print(type(model))
 ```
 
 
-## Todo list
+
+
+Done:
 
 load model which save model by 
 
 ```
 torch.save(model, "path/to/model")
 ```
+
+## Todo list
+
+DATA PARALLELISM
