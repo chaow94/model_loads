@@ -23,6 +23,8 @@ To install load_models, you can do as follow:
     pip install model-loads
 ```
 
+Or from source
+
 ```
     git clone https://github.com/cwh94/model_loads.git
     cd load_models
