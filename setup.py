@@ -20,7 +20,7 @@ def setup_package():
     #
     # else:
     setup(name='model-loads',
-          version='0.1.1',
+          version='0.2.2',
           long_description=long_description,  # Optional
           long_description_content_type='text/markdown',  # Optional (see note above)
 

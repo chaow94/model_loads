@@ -48,7 +48,8 @@ def loads_state_dict(model_path, use_gpu=True):
 
     if "module." in list(state_dict.keys())[0]:
         for k, v in state_dict.items():
-            name = k[7:]  # remove `module.`
+            # name = k[7:]  # remove `module.`
+            name = k.replace("module.", "")  # remove `module.`
             new_state_dict[name] = v
         state_dict = new_state_dict
 
@@ -69,4 +70,4 @@ if __name__ == "__main__":
 
     state_dict, other_param = loads_state_dict("../../tests/mnist_cnn_model.pt")
     m = Net()
-    model = load_param(state_dict, m)
+    model, _ = load_param(state_dict, m)
