@@ -10,7 +10,6 @@ from model_loads.utils import load_param, loads_state_dict, LoadException
 
 
 def load_models(model_path, model, use_gpu=True):
-
     other_param = None
     try:
         state_dict, other_param = loads_state_dict(model_path)

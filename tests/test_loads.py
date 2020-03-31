@@ -1,13 +1,15 @@
-import unittest
+import os
 
-from examples.models.tar.mobilenet_v2 import MobileNetV2
-from model_loads.loads import load_models
+from tests.mnist import Net
+from model_loads import load_models
 
-model = MobileNetV2()
-model_path = "../examples/models/tar/checkpoint.pth.tar"
+model = Net()
+path = os.getcwd()
+print(path)
+# model, other_param = load_models(path + "/tests/cpu_models/mnist_cnn.pth.tar", model)
+model, other_param = load_models(path + "/cpu_models/mnist_cnn_model.pt", model)
+model, other_param = load_models(path + "/cpu_models/mnist_cnn_state_dict.pt", model)
 
-
-class MyTest(unittest.TestCase):
-    def test_load_models(self, model_path, model):
-        load_models(model_path, model)
-        assert type(model) == "<class 'torchvision.models.mobilenet.MobileNetV2'>"
+model, other_param = load_models(path + "/gpu_models/mnist_cnn.pth.tar", model)
+model, other_param = load_models(path + "/gpu_models/mnist_cnn_model.pt", model)
+model, other_param = load_models(path + "/gpu_models/mnist_cnn_state_dict.pt", model)

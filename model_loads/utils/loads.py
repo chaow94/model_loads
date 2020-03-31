@@ -1,9 +1,27 @@
 from collections import OrderedDict
+from numbers import Number
 
 import torch
 import logging
 
 from model_loads.utils import model_type
+
+from tabulate import tabulate
+
+
+# this function borrow from https://github.com/NervanaSystems/distiller/blob/6dfa8747f1c39d5ab7af1d1f46ec26f450cbc006
+# /distiller/apputils/checkpoint.py#L95
+def get_contents_table(d):
+    def inspect_val(val):
+        if isinstance(val, (Number, str)):
+            return val
+        elif isinstance(val, type):
+            return val.__name__
+        return None
+
+    contents = [[k, type(d[k]).__name__, inspect_val(d[k])] for k in d.keys()]
+    contents = sorted(contents, key=lambda entry: entry[0])
+    return tabulate(contents, headers=["Key", "Type", "Value"], tablefmt="psql")
 
 
 def loads_state_dict(model_path, use_gpu=True):
@@ -36,6 +54,7 @@ def loads_state_dict(model_path, use_gpu=True):
         state_dict = checkpoint
 
     elif _type == "pth_tar":
+        print('=> Checkpoint contents:\n%s\n' % get_contents_table(checkpoint))
         state_dict = checkpoint["state_dict"]
         other_param = checkpoint.pop("state_dict")
 
