@@ -1,12 +1,10 @@
 from collections import OrderedDict
 from numbers import Number
-
+from tabulate import tabulate
 import torch
 import logging
 
 from model_loads.utils import model_type
-
-from tabulate import tabulate
 
 
 # this function borrow from https://github.com/NervanaSystems/distiller/blob/6dfa8747f1c39d5ab7af1d1f46ec26f450cbc006
@@ -27,7 +25,7 @@ def get_contents_table(d):
 def loads_state_dict(model_path, use_gpu=True):
     # to load
     if use_gpu and torch.cuda.is_available():
-        checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
+        checkpoint = torch.load(model_path)
     else:
         checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
 
@@ -55,8 +53,8 @@ def loads_state_dict(model_path, use_gpu=True):
 
     elif _type == "pth_tar":
         print('=> Checkpoint contents:\n%s\n' % get_contents_table(checkpoint))
-        state_dict = checkpoint["state_dict"]
-        other_param = checkpoint.pop("state_dict")
+        state_dict = checkpoint.pop("state_dict")
+        other_param = checkpoint
 
     else:
         raise Exception("Not support this type model yet!")

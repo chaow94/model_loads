@@ -1,5 +1,4 @@
 import os
-
 import torch
 
 __all__ = ["load_models"]
