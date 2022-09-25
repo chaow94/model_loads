@@ -39,7 +39,7 @@ def setup_package():
 
           url='https://github.com/cwh94/model_loads',  # Optional
           description='Loads GPU or CPU pytorch models',
-          author='wangchao',
+          author='cwh94',
           author_email='chaowanghs@gmail.com',
           packages=find_packages(),
           )
