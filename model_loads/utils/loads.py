@@ -1,14 +1,17 @@
 from collections import OrderedDict
 from numbers import Number
 from tabulate import tabulate
+import torch.nn as nn
 import torch
 import logging
 
 from model_loads.utils import model_type
 
-
 # this function borrow from https://github.com/NervanaSystems/distiller/blob/6dfa8747f1c39d5ab7af1d1f46ec26f450cbc006
 # /distiller/apputils/checkpoint.py#L95
+from model_loads.utils.utils import model_device
+
+
 def get_contents_table(d):
     def inspect_val(val):
         if isinstance(val, (Number, str)):
@@ -22,12 +25,11 @@ def get_contents_table(d):
     return tabulate(contents, headers=["Key", "Type", "Value"], tablefmt="psql")
 
 
-def loads_state_dict(model_path, use_gpu=True):
-    # to load
-    if use_gpu and torch.cuda.is_available():
-        checkpoint = torch.load(model_path)
-    else:
-        checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
+def loads_state_dict(model, model_path):
+    # confirm device which model location
+    device = model_device(model)
+
+    checkpoint = torch.load(model_path, device)
 
     _type = model_type(ckpt=checkpoint)
     other_param = None
@@ -70,21 +72,27 @@ def loads_state_dict(model_path, use_gpu=True):
             new_state_dict[name] = v
         state_dict = new_state_dict
 
+    # return parameter without prefix: module.
     return state_dict, other_param
 
 
-def load_param(state_dict, model=None, use_gpu=True):
-    model.load_state_dict(state_dict)
-    if use_gpu and torch.cuda.is_available():
-        model.cuda()
+def load_param(state_dict, model=None):
+    device = model_device(model)
+
+    if isinstance(model, nn.DataParallel):
+        model.module.load_state_dict(state_dict=state_dict)
     else:
-        model.cpu()
-    return model
+        model.load_state_dict(state_dict=state_dict)
+
+    return model.to(device)
 
 
 if __name__ == "__main__":
     from tests.mnist import Net
 
-    state_dict, other_param = loads_state_dict("../../tests/mnist_cnn_model.pt")
     m = Net()
-    model, _ = load_param(state_dict, m)
+
+    state_dict, other_param = loads_state_dict(model=m, model_path="../../tests/mnist_cnn_state_dict.pt")
+
+    model = load_param(state_dict, m)
+

@@ -1,15 +1,40 @@
 import os
+import sys
 
-from tests.mnist import Net
+sys.path.insert(0, '../')
+
 from model_loads import load_models
+
+from mnist import Net
 
 model = Net()
 path = os.getcwd()
 print(path)
-# model, other_param = load_models(path + "/tests/cpu_models/mnist_cnn.pth.tar", model)
-model, other_param = load_models(path + "/cpu_models/mnist_cnn_model.pt", model)
-model, other_param = load_models(path + "/cpu_models/mnist_cnn_state_dict.pt", model)
 
-model, other_param = load_models(path + "/gpu_models/mnist_cnn.pth.tar", model)
-model, other_param = load_models(path + "/gpu_models/mnist_cnn_model.pt", model)
-model, other_param = load_models(path + "/gpu_models/mnist_cnn_state_dict.pt", model)
+# Test env:
+# torch >=1.6
+
+# cur model: GPU   pretrain model:GPU
+model, other_param = load_models('./new_zipfile_serialization/gpu/mnist.pth.tar', model)
+model, other_param = load_models('./new_zipfile_serialization/gpu/mnist_state_dict.pt', model)
+model, other_param = load_models('./new_zipfile_serialization/gpu/mnist_with_model_def.pt', model)
+
+# cur model: GPU   pretrain model:CPU
+model, other_param = load_models('./new_zipfile_serialization/cpu/mnist.pth.tar', model)
+model, other_param = load_models('./new_zipfile_serialization/cpu/mnist_state_dict.pt', model)
+model, other_param = load_models('./new_zipfile_serialization/cpu/mnist_with_model_def.pt', model)
+
+# pass
+
+# Test env:
+# torch < 1.6
+
+# cur model: GPU   pretrain model:GPU
+model, other_param = load_models('./pickle_serialization/gpu/mnist.pth.tar', model)
+model, other_param = load_models('./pickle_serialization/gpu/mnist_state_dict.pt', model)
+model, other_param = load_models('./pickle_serialization/gpu/mnist_with_model_def.pt', model)
+
+# cur model: GPU   pretrain model:CPU
+model, other_param = load_models('./pickle_serialization/cpu/mnist.pth.tar', model)
+model, other_param = load_models('./pickle_serialization/cpu/mnist_state_dict.pt', model)
+model, other_param = load_models('./pickle_serialization/cpu/mnist_with_model_def.pt', model)

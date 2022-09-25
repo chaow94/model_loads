@@ -1,4 +1,6 @@
+import os
 import argparse
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -52,7 +54,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+                       100. * batch_idx / len(train_loader), loss.item()))
 
 
 def test(args, model, device, test_loader):
@@ -113,9 +115,9 @@ def main():
         batch_size=args.batch_size, shuffle=True, **kwargs)
     test_loader = torch.utils.data.DataLoader(
         datasets.MNIST('../data', train=False, transform=transforms.Compose([
-                           transforms.ToTensor(),
-                           transforms.Normalize((0.1307,), (0.3081,))
-                       ])),
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,))
+        ])),
         batch_size=args.test_batch_size, shuffle=True, **kwargs)
 
     model = Net().to(device)
@@ -128,45 +130,61 @@ def main():
         scheduler.step()
 
     if args.save_model:
-        torch.save(model.state_dict(), "mnist_cnn_state_dict.pt")
-        torch.save(model, "mnist_cnn_model.pt")
-        torch.save({
-            'state_dict': model.state_dict(),
-            'optimizer' : optimizer.state_dict(),
-        }, "mnist_cnn.pth.tar")
+        ver = torch.__version__
+        fp_ver = float(ver.split('.')[0]) + 0.1 * float(ver.split('.')[1])
+
+        if fp_ver >= 1.6:
+            if not os.path.exists('new_zipfile_serialization'):
+                os.mkdir('new_zipfile_serialization/')
+            if torch.cuda.is_available():
+                if not os.path.exists('gpu'):
+                    os.mkdir('new_zipfile_serialization/gpu')
+
+                torch.save(model.state_dict(), "new_zipfile_serialization/gpu/mnist_state_dict.pt")
+                torch.save(model, "new_zipfile_serialization/gpu/mnist_with_model_def.pt")
+                torch.save({
+                    'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                }, "new_zipfile_serialization/gpu/mnist.pth.tar")
+
+            else:
+                if not os.path.exists('cpu'):
+                    os.mkdir('new_zipfile_serialization/cpu')
+
+                torch.save(model.state_dict(), "new_zipfile_serialization/cpu/mnist_state_dict.pt")
+                torch.save(model, "new_zipfile_serialization/cpu/mnist_with_model_def.pt")
+                torch.save({
+                    'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                }, "new_zipfile_serialization/cpu/mnist.pth.tar")
+
+        else:
+            if not os.path.exists('pickle_serialization'):
+                os.mkdir('pickle_serialization/')
+            if torch.cuda.is_available():
+                if not os.path.exists('gpu'):
+                    os.mkdir('pickle_serialization/gpu')
+
+                torch.save(model.state_dict(), "pickle_serialization/gpu/mnist_state_dict.pt")
+                torch.save(model, "pickle_serialization/gpu/mnist_with_model_def.pt")
+                torch.save({
+                    'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                }, "pickle_serialization/gpu/mnist.pth.tar")
+
+            else:
+                if not os.path.exists('cpu'):
+                    os.mkdir('pickle_serialization/cpu')
+
+                torch.save(model.state_dict(), "pickle_serialization/cpu/mnist_state_dict.pt")
+                torch.save(model, "pickle_serialization/cpu/mnist_with_model_def.pt")
+                torch.save({
+                    'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                }, "pickle_serialization/cpu/mnist.pth.tar")
 
 
 if __name__ == '__main__':
+    os.environ['CUDA_VISIBLE_DEVICES'] = ' '
+    print(torch.cuda.is_available())
     main()
-#     model = torch.load("mnist_cnn_model.pt")
-#     print(dir(model))
-#     # print(model.keys())
-#     print(type(model))
-#     print((model.state_dict()))
-#     '''
-#     [  'named_children', 'named_modules', 'named_parameters', 'parameters', 'register_back
-#     ward_hook', 'register_buffer', 'register_forward_hook', 'register_forward_pre_hook',
-#      'register_parameter', 'requires_grad_', 'share_memory', 'state_dict', 'to', '
-#      train', 'training', 'type', 'zero_grad']
-#
-#     '''
-#
-#
-#     model = torch.load("mnist_cnn_state_dict.pt")
-#     print(dir(model))
-#     print(model.keys())
-#     print(type(model))
-#
-#     model = torch.load("mnist_cnn.pth.tar")
-#     print(dir(model))
-#     print(model.keys())
-#     print(type(model))
-#
-#     '''
-#     ['__call__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattr__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_apply', '_backward_hooks', '_buffers', '_forward_hooks', '_forward_pre_hooks', '_get_name', '_load_from_state_dict', '_load_state_dict_pre_hooks', '_modules', '_named_members', '_parameters', '_register_load_state_dict_pre_hook', '_register_state_dict_hook', '_replicate_for_data_parallel', '_save_to_state_dict', '_slow_forward', '_state_dict_hooks', '_version', 'add_module', 'apply', 'buffers', 'children', 'conv1', 'conv2', 'cpu', 'cuda', 'double', 'dropout1', 'dropout2', 'dump_patches', 'eval', 'extra_repr', 'fc1', 'fc2', 'float', 'forward', 'half', 'load_state_dict', 'modules', 'named_buffers', 'named_children', 'named_modules', 'named_parameters', 'parameters', 'register_backward_hook', 'register_buffer', 'register_forward_hook', 'register_forward_pre_hook', 'register_parameter', 'requires_grad_', 'share_memory', 'state_dict', 'to', 'train', 'training', 'type', 'zero_grad']
-# ['__class__', '__contains__', '__delattr__', '__delitem__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__len__', '__lt__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__reversed__', '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__', '_metadata', 'clear', 'copy', 'fromkeys', 'get', 'items', 'keys', 'move_to_end', 'pop', 'popitem', 'setdefault', 'update', 'values']
-# odict_keys(['conv1.weight', 'conv1.bias', 'conv2.weight', 'conv2.bias', 'fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias'])
-# ['__class__', '__contains__', '__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__len__', '__lt__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__', 'clear', 'copy', 'fromkeys', 'get', 'items', 'keys', 'pop', 'popitem', 'setdefault', 'update', 'values']
-# dict_keys(['state_dict', 'optimizer'])
-#     '''
-#

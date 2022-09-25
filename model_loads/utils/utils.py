@@ -1,4 +1,5 @@
 import torch
+from torch import nn
 
 
 def get_gpu_nums():
@@ -27,6 +28,18 @@ def get_gpus_info():
         print("GPU is not available or no GPUs!")
 
 
+# https://github.com/IntelLabs/distiller/blob/master/distiller/utils.py#L40
+def model_device(model):
+    """Determine the device the model is allocated on."""
+    # Source: https://discuss.pytorch.org/t/how-to-check-if-model-is-on-cuda/180
+    if isinstance(model, nn.DataParallel):
+        return model.src_device_obj
+    try:
+        return str(next(model.parameters()).device)
+    except StopIteration:
+        # Model has no parameters
+        pass
+    return 'cpu'
 
 
 if __name__ == "__main__":

@@ -5,10 +5,10 @@ import torch
 
 
 def model_type(ckpt):
-    '''
+    """
     :param ckpt: torch.load(model_path)
     :return:
-    '''
+    """
     if isinstance(ckpt, collections.OrderedDict):
         _type = "state_dict_pth"
 
@@ -26,6 +26,6 @@ def model_type(ckpt):
 
 
 if __name__ == "__main__":
-    print(model_type("../../tests/mnist_cnn.pth.tar"))
-    print(model_type("../../tests/mnist_cnn_state_dict.pt"))
-    print(model_type("../../tests/mnist_cnn_model.pt"))
+    print(model_type(torch.load("../../tests/mnist_cnn.pth.tar")))
+    print(model_type(torch.load("../../tests/mnist_cnn_state_dict.pt", map_location=torch.device('cpu'))))
+    print(model_type(torch.load("../../tests/mnist_cnn_model.pt", map_location=torch.device('cpu'))))

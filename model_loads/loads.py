@@ -1,24 +1,24 @@
 import os
-import torch
 
 __all__ = ["load_models"]
 
 # https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-model-across-devices
 
-from model_loads.utils import load_param, loads_state_dict, LoadException
+from model_loads.utils import load_param, loads_state_dict, LoadException, model_device
 
 
-def load_models(model_path, model, use_gpu=True):
+def load_models(model_path, model):
+    device = model_device(model)
+
     other_param = None
     try:
-        state_dict, other_param = loads_state_dict(model_path)
+        state_dict, other_param = loads_state_dict(model, model_path)
         model = load_param(state_dict, model)
+        print("Success load model to {}!".format(device))
+
     except LoadException as e:
         print("error in loading models! Please check load methods.")
         print(e.args)
-    else:
-        print("Success load model to {}!".
-              format("GPU" if use_gpu and torch.cuda.is_available() else "CPU"))
 
     return model, other_param
 

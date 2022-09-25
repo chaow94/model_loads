@@ -73,18 +73,3 @@ model, _ = lo.load_models(model_path, model, use_gpu=True)
 print(model)
 print(type(model))
 ```
-
-
-
-
-Done:
-
-load model which save model by 
-
-```
-torch.save(model, "path/to/model")
-```
-
-## Todo list
-
-DATA PARALLELISM
