@@ -12,8 +12,7 @@ It's annoying to load cpu model to gpu devices or load multi-gpus trained model 
 
 - [Table of Contents](#table-of-contents) 
 - [Installation](#installation)
-- [Getting Started](#getting-started)
-- [TODO list](#todo-list)
+- [Getting Started](#getting-started) 
 
 ## Installation
 
@@ -40,9 +39,10 @@ Or from source
 import model_loads as lo
 import torchvision.models as models
 
-model = models.MobileNetV2()
+model = models.MobileNetV2().cuda() # move to GPU 
+
 model_path = "../examples/models/pth/mobilenet_v2-b0353104.pth"
-model, _ = lo.load_models(model_path, model, use_gpu=True)
+model, _ = lo.load_models(model_path, model)
 print(model)
 print(type(model))
 ```
@@ -52,7 +52,7 @@ print(type(model))
 ```
 from models.tar.mobilenet_v2 import MobileNetV2
 
-model = MobileNetV2()
+model = MobileNetV2()  # move to CPU
 model_path = "models/tar/checkpoint.pth.tar"
 
 model, other_param = lo.load_models(model_path, model)
@@ -69,7 +69,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 model = models.MobileNetV2()
 model_path = "models/pth/mobilenet_v2-b0353104.pth"
-model, _ = lo.load_models(model_path, model, use_gpu=True)
+model, _ = lo.load_models(model_path, model)
 print(model)
 print(type(model))
 ```
